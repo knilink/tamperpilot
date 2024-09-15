@@ -1,0 +1,32 @@
+{
+  "name": "tamperpilot",
+  "version": "0.1.0",
+  "description": "A tool allows to customize and enhance the functionality of copilot editor plugins.",
+  "scripts": {
+    "patch": "node scripts/patch.js",
+    "test-completion": "node scripts/test-completion.js"
+  },
+  "keywords": [],
+  "author": "knilink",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "archiver": "^7.0.1",
+    "build": "^0.1.4",
+    "jscodeshift": "^17.0.0",
+    "ngraph.graph": "^20.0.1",
+    "ngraph.pagerank": "^2.1.1",
+    "prettier": "^3.3.3",
+    "rollup": "^4.21.2",
+    "source-map": "^0.7.4",
+    "status": "^0.0.13",
+    "typescript": "^5.5.4",
+    "unzipper": "^0.12.3",
+    "vlq": "^2.0.4",
+    "vsce": "^2.15.0",
+    "vscode-jsonrpc": "^8.2.1",
+    "vscode-languageserver": "^9.0.1",
+    "xml2js": "^0.6.2",
+    "yargs": "^17.7.2"
+  }
+}
