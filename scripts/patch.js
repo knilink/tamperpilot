@@ -124,12 +124,16 @@ async function patch(input_file_path, entry_name, is_agent) {
     current_line++;
 
     if (current_line === 1) {
-      if (line.startsWith('#')) {
+      let insert_before = line.startsWith('#');
+      if (insert_before) {
         w.write(line + '\n');
       }
       for (const chunk of build_output) {
         line_shift += chunk.code.split('\n') - 1;
         w.write(chunk.code);
+      }
+      if (!insert_before) {
+        w.write(line + '\n');
       }
     }
 
@@ -207,7 +211,12 @@ async function update_manifest(tmpdir) {
 async function update_package_json(tmpdir) {
   const file = path.join(tmpdir, 'extension', 'package.json');
   const package = JSON.parse(await fs.promises.readFile(file));
-  package.name = 'tamperpilot';
+  // package.name = 'tamperpilot';
+  package.displayName = 'Tamperpilot';
+  package.description = 'Your local AI pair programmer';
+  // package.publisher = 'Tamperpilot';
+  // package.activationEvents = [];
+  package.extensionPack = [];
 
   await fs.promises.writeFile(file, JSON.stringify(package, null, 2), 'utf8');
 }
