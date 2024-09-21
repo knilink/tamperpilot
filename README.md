@@ -20,9 +20,9 @@ npm install
 
 4. Patch script
 ```sh
-npm run patch openAI ../copilot.vim/dist/language-server.js
+npm run patch openai ../copilot.vim/dist/language-server.js
 ```
-where "openAI" is the build entry of the script to be injected, which is src/openAI.ts
+where "openai" is the build entry of the script to be injected, which is src/openai.ts
 If this step succeed, there should be a `../copilot.vim/dist/language-server-tampered.js` generated.
 
 

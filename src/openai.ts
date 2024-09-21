@@ -36,7 +36,10 @@ tctx.tamper('OpenAIFetcher', (instance) => {
     cancellationToken
   ) {
     const postOptions: any = {};
-    if (!!model) {
+    const engine = tctx.getByName('ConfigProvider').getOptionalConfig('advanced.debug.overrideEngine' as any);
+    if (engine) {
+      postOptions['model'] = engine;
+    } else if (!!model) {
       postOptions['model'] = model;
     }
     if (!!stop.length) {
