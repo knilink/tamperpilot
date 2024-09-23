@@ -40,15 +40,6 @@ async function run() {
 
   console.log('initialize', JSON.stringify(initialize));
 
-  const didOpen = await connection.sendNotification('textDocument/didOpen', {
-    textDocument: {
-      uri: dummyDoc.uri,
-      languageId: 'python',
-      version: 1,
-      text: dummyDoc.content,
-    },
-  });
-
   await connection.sendRequest('setEditorInfo', {
     editorInfo: {
       name: 'dummy',
@@ -60,6 +51,15 @@ async function run() {
     // authProvider: { url: 'http://localhost:8001' },
     // redirectTelemetry: Type.Optional(Type.Boolean()),
     // options: Type.Optional(Type.Object({})),
+  });
+
+  const didOpen = await connection.sendNotification('textDocument/didOpen', {
+    textDocument: {
+      uri: dummyDoc.uri,
+      languageId: 'python',
+      version: 1,
+      text: dummyDoc.content,
+    },
   });
 
   const completion = await connection.sendRequest('getCompletions', {

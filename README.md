@@ -30,10 +30,19 @@ If this step succeed, there should be a `../copilot.vim/dist/language-server-tam
 ```sh
 npm run test-completion -- \
   ../copilot.vim/dist/language-server-tampered.js --stdio --debug \
-  --baseUrl=http://localhost:11434 \
+  --baseUrl=http://localhost:11434/v1 \
   --model=deepseek-coder-v2:16b-lite-base-q4_K_M \
   --stop='<|file_separator|>' --stop=$'\n'
 ```
+Args explanation:
+- `--stdio`: always required by language server.
+- `--debug`(optional): language server built-in debug args to enable debug log level.
+- `--baseUrl`: The base url of openai completions endpoint, e.g. `http://localhost:11434/v1` for ollama
+- `--model`: model parameter to be injected to completion request payload, or alternatively use language server's built-in env `AGENT_DEBUG_OVERRIDE_ENGINE`
+- `--stop`: overriding language server's built-in stop sequences
+- `--add-stop`: append stop sequences to language server's built-in stop sequences
+- `--unset-stop`: unset stop sequences
+
 When testing with ollama, make sure the model support FIM and the model file is the latest, *AVOID* `codegemma` as its tokenizer is required to be fixed with latest llamacpp/ollama.
 If this step succeed, log message `completion  {"completions":[..., "text":"    age = current_year - birth_year", ...}]}` can be seen at the last line.
 

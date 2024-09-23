@@ -24,9 +24,14 @@ tctx.tamper('ConfigProvider', (instance) => {
 tctx.tamper('OpenAIFetcher', (instance) => {
   const model = process.argv.find((arg) => arg.startsWith('--model'))?.split('--model=')[1];
   const stop = process.argv
-    .filter((arg) => arg.startsWith('--stop'))
+    .filter((arg) => arg.startsWith('--stop='))
     .map((arg) => arg.split('--stop=')[1])
     .filter((arg) => !!arg);
+  const addStop = process.argv
+    .filter((arg) => arg.startsWith('--add-stop='))
+    .map((arg) => arg.split('--add-stop=')[1])
+    .filter((arg) => !!arg);
+  const unsetStop = process.argv.some((arg) => arg.startsWith('--unset-stop='));
   const _fetchAndStreamCompletions = instance.fetchAndStreamCompletions;
   instance.fetchAndStreamCompletions = async function (
     ctx,
@@ -42,8 +47,15 @@ tctx.tamper('OpenAIFetcher', (instance) => {
     } else if (!!model) {
       postOptions['model'] = model;
     }
+    if (unsetStop) {
+      postOptions['stop'] = undefined;
+    }
     if (!!stop.length) {
       postOptions['stop'] = stop;
+    }
+    if (!!addStop.length) {
+      postOptions['stop'] ??= [];
+      postOptions['stop'].push(...addStop);
     }
     return _fetchAndStreamCompletions.call(
       this,
@@ -76,7 +88,7 @@ tctx.tamper('AvailableModelManager', (instance) => {
         return {
           modelId: 'dummy-model-id',
           forceBaseModel: false,
-          path: '/v1',
+          path: '',
           headers: {},
         };
       },
