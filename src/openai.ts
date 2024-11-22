@@ -8,8 +8,19 @@ emptyCerts(tctx);
 buildType(tctx, 'dev');
 nukeTelemetry(tctx);
 
+function getArgs(flag: string): string[] {
+  return process.argv
+    .filter((arg) => arg.startsWith(`${flag}=`))
+    .map((arg) => arg.split(`${flag}=`)[1])
+    .filter((arg) => !!arg);
+}
+
+function hasFlag(flag: string): boolean {
+  return process.argv.some((arg) => arg.startsWith(flag));
+}
+
 tctx.tamper('ConfigProvider', (instance) => {
-  const baseUrl = process.argv.find((arg) => arg.startsWith('--baseUrl'))?.split('--baseUrl=')[1];
+  const baseUrl = getArgs('--baseUrl')[0];
   const overrides: Record<string, string | undefined> = {
     'advanced.debug.overrideProxyUrl': baseUrl,
   };
@@ -23,16 +34,14 @@ tctx.tamper('ConfigProvider', (instance) => {
 
 tctx.tamper('OpenAIFetcher', (instance) => {
   const model = process.argv.find((arg) => arg.startsWith('--model'))?.split('--model=')[1];
-  const stop = process.argv
-    .filter((arg) => arg.startsWith('--stop='))
-    .map((arg) => arg.split('--stop=')[1])
-    .filter((arg) => !!arg);
-  const addStop = process.argv
-    .filter((arg) => arg.startsWith('--add-stop='))
-    .map((arg) => arg.split('--add-stop=')[1])
-    .filter((arg) => !!arg);
-  const unsetStop = process.argv.some((arg) => arg.startsWith('--unset-stop='));
+  const stop = getArgs('--stop');
+  const addStop = getArgs('--add-stop');
+  const unsetStop = hasFlag('--unset-stop');
+  const _maxSuffixLines = getArgs('--max-suffix-length')[0];
+  const maxSuffixLines = _maxSuffixLines ? parseInt(_maxSuffixLines) : undefined;
+
   const _fetchAndStreamCompletions = instance.fetchAndStreamCompletions;
+
   instance.fetchAndStreamCompletions = async function (
     ctx,
     completionParams,
@@ -57,11 +66,21 @@ tctx.tamper('OpenAIFetcher', (instance) => {
       postOptions['stop'] ??= [];
       postOptions['stop'].push(...addStop);
     }
+
+    let suffix = completionParams.prompt?.suffix;
+    if (maxSuffixLines) {
+      suffix = (suffix ?? '').split('\n').slice(0, maxSuffixLines).join('\n');
+    }
+
     return _fetchAndStreamCompletions.call(
       this,
       ctx,
       {
         ...completionParams,
+        prompt: {
+          ...completionParams.prompt,
+          suffix,
+        },
         postOptions: {
           ...completionParams.postOptions,
           ...postOptions,

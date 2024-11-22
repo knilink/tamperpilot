@@ -31,19 +31,20 @@ If this step succeed, there should be a `../copilot.vim/dist/language-server-tam
 npm run test-completion -- \
   ../copilot.vim/dist/language-server-tampered.js --stdio --debug \
   --baseUrl=http://localhost:11434/v1 \
-  --model=deepseek-coder-v2:16b-lite-base-q4_K_M \
-  --stop='<|file_separator|>' --stop=$'\n'
+  --model=qwen2.5-coder:7b-base-q4_K_M \
+  --add-stop='<|file_sep|>'
 ```
 Args explanation:
 - `--stdio`: always required by language server.
-- `--debug`(optional): language server built-in debug args to enable debug log level.
+- `--debug` (optional): language server built-in debug args to enable debug log level.
 - `--baseUrl`: The base url of openai completions endpoint, e.g. `http://localhost:11434/v1` for ollama
 - `--model`: model parameter to be injected to completion request payload, or alternatively use language server's built-in env `AGENT_DEBUG_OVERRIDE_ENGINE`
-- `--stop`: overriding language server's built-in stop sequences
-- `--add-stop`: append stop sequences to language server's built-in stop sequences
-- `--unset-stop`: unset stop sequences
+- `--stop` (optional): overriding language server's built-in stop sequences
+- `--add-stop` (optional): append stop sequences to language server's built-in stop sequences
+- `--unset-stop` (optional): unset the built-in stop sequences
+<!-- - `--max-suffix-lines` (optional): max suffix lines to be sent to completion request payload, default is to allocate 15% of the total prefix+suffix which might be too large for smaller models and degrade the completion quality.… -->
 
-When testing with ollama, make sure the model support FIM and the model file is the latest, *AVOID* `codegemma` as its tokenizer is required to be fixed with latest llamacpp/ollama.
+When testing with ollama, make sure the model support FIM and the model file is the latest, `qwen2.5-coder` is recommanded.
 If this step succeed, log message `completion  {"completions":[..., "text":"    age = current_year - birth_year", ...}]}` can be seen at the last line.
 
 If the completion is empty, check the log for `[fetchCompletions] request.response: [http://localhost:11434/v1/completions]` to make sure the request is sending to the specified `--baseUrl`, as well as server's non 200 responses.
